@@ -79,17 +79,32 @@ async function run() {
     });
 
 
-    app.get("/mycollege/:email", async (req, res) => {
+    app.get("/mycolleges/:email", async (req, res) => {
       const email = req.params.email;
+      console.log(email)
       const filter = { candidateEmail : email };
       const result = await mycollegeCollection.find(filter).toArray();
-      res.send({mycolleges : result});  
+      res.send({mycolleges:result});  
     });
 
     app.post("/addCollege", async (req, res) => {
       const newItem = req.body;
       const result = await mycollegeCollection.insertOne(newItem);
       res.send(result);
+    });
+
+    app.patch("/review/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const { Review,Rating } = req.body;
+        console.log(Review,Rating)
+        const filter = { _id: new ObjectId(id) };
+        const update = { $set: { review: Review, rating: Rating } };
+        const result = await mycollegeCollection.updateOne(filter, update);
+        res.send(result);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to update class data" });
+      }
     });
     
 
